@@ -1,0 +1,6 @@
+venv/
+.venv/
+build/
+bin/
+out/
+output/
