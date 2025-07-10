@@ -28,7 +28,7 @@ pip install -r requirements.txt
 1. Clone or download this repository:
 
    ```bash
-   git clone https://github.com/yourusername/chipper.git
+   git clone git@github.com:0xdbb/image-chipper.git
    cd chipper
    ```
 
