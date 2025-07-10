@@ -63,16 +63,10 @@ make
 - `--help`        Show help and exit.
 - `--bands`        What bands to process (Optional)
 
-### Examples
+### Example
 
 - Chip a large GeoTIFF into 640×640 GeoTIFF tiles:
 
   ```bash
-  python3 chipper.py --input ./data/satellite.tif --size 512 --format png --output-dir output/png_chips
-  ```
-
-- Generate 512×512 PNG chips:
-
-  ```bash
-  python chipper.py --input data/satellite.tif -size 640 --bands 3,2,1  --format png --output-dir output/png_chips
+  python3 chipper.py --input ./data/satellite.tif --size 640 --format png --output-dir output/png_chips
   ```
