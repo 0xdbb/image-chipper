@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
    ```bash
    git clone git@github.com:0xdbb/image-chipper.git
-   cd chipper
+   cd image-chipper
    ```
 
 2. (Optional) Create and activate a virtual environment:
