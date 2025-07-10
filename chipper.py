@@ -27,7 +27,9 @@ def chip_image(input_path, chip_size, output_dir, output_format, bands=None):
         ) as pbar:
             for top in range(0, img_height, chip_size):
                 for left in range(0, img_width, chip_size):
-                    window = Window(left, top, chip_size, chip_size)
+                    w = min(chip_size, img_width - left)
+                    h = min(chip_size, img_height - top)
+                    window = Window(left, top, w, h)
                     transform_chip = src.window_transform(window)
 
                     chip = src.read(indexes=bands, window=window)
@@ -36,14 +38,12 @@ def chip_image(input_path, chip_size, output_dir, output_format, bands=None):
                         pbar.update(1)
                         continue
 
-                    w = min(chip_size, img_width - left)
-                    h = min(chip_size, img_height - top)
-
                     chip_filename_base = os.path.join(
                         output_dir,
                         f"{os.path.splitext(os.path.basename(input_path))[0]}_chip_{chip_id}",
                     )
 
+                    # === GeoTIFF Output ===
                     if output_format == "tif":
                         chip_filename = f"{chip_filename_base}.tif"
                         with rasterio.open(
@@ -59,26 +59,35 @@ def chip_image(input_path, chip_size, output_dir, output_format, bands=None):
                         ) as dst:
                             dst.write(chip)
 
-                    elif output_format == "png":
-                        chip_filename = f"{chip_filename_base}.png"
+                    # === PNG/JPEG Output ===
+                    elif output_format in ["png", "jpeg", "jpg"]:
+                        ext = "jpg" if output_format == "jpg" else output_format
+                        chip_filename = f"{chip_filename_base}.{ext}"
 
-                        chip_rgb = np.moveaxis(chip, 0, -1)  # Channels last
+                        # Ensure RGB for image formats
+                        if chip.shape[0] != 3:
+                            raise ValueError(
+                                f"{output_format.upper()} output requires 3 bands (RGB), got {chip.shape[0]}"
+                            )
+
+                        chip_rgb = np.moveaxis(chip, 0, -1)
 
                         if chip_rgb.dtype != np.uint8:
                             chip_rgb = np.nan_to_num(
                                 chip_rgb, nan=0.0, posinf=255.0, neginf=0.0
                             )
-
                             if np.max(chip_rgb) <= 1.0:
                                 chip_rgb = (chip_rgb * 255).astype(np.uint8)
                             else:
                                 chip_rgb = np.clip(chip_rgb, 0, 255).astype(np.uint8)
 
                         img = Image.fromarray(chip_rgb)
-                        img.save(chip_filename)
+                        img.save(chip_filename, format=ext.upper())
 
                     else:
-                        raise ValueError("Unsupported format. Choose 'tif' or 'png'.")
+                        raise ValueError(
+                            "❌ Unsupported format. Choose 'tif', 'png', or 'jpg/jpeg'."
+                        )
 
                     chip_id += 1
                     saved_chips += 1
@@ -102,9 +111,9 @@ def main():
         "-f",
         "--format",
         type=str,
-        choices=["tif", "png"],
+        choices=["tif", "png", "jpg", "jpeg"],
         default="tif",
-        help="Output format (tif or png)",
+        help="Output format (tif, png, or jpg)",
     )
     parser.add_argument(
         "-o",
@@ -129,10 +138,7 @@ def main():
         )
 
     # Parse bands if provided
-    if args.bands:
-        bands = list(map(int, args.bands.split(",")))
-    else:
-        bands = None
+    bands = list(map(int, args.bands.split(","))) if args.bands else None
 
     # Process a single file
     if args.input:
@@ -141,9 +147,7 @@ def main():
     # Process a directory
     if args.input_dir:
         for filename in os.listdir(args.input_dir):
-            if filename.lower().endswith(
-                (".tif", ".tiff")
-            ):  # Only process raster files
+            if filename.lower().endswith((".tif", ".tiff")):
                 input_path = os.path.join(args.input_dir, filename)
                 chip_image(input_path, args.size, args.output_dir, args.format, bands)
 

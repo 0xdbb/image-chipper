@@ -45,17 +45,16 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python chipper.py --input <INPUT_FILE> [--size <PIXELS>] [--format {tif,png}] [--output-dir <DIR>]
+python chipper.py --input <INPUT_FILE> [--size <PIXELS>] [--format {tif,png,jpeg}] [--output-dir <DIR>]
 ```
 
 ### Arguments
 
-- `--input`       Path to the input raster (GeoTIFF, JPEG, etc.).
+- `--input`       Path to the input raster (GeoTIFF, JPEG/JPG, PNG etc.).
 - `--size`        Width and height (pixels) of each output chip. Default: `640`.
 - `--format`      Output image format: `tif` (GeoTIFF) or `png`. Default: `tif`.
 - `--output-dir`  Directory to save output chips. Default: `./chips`.
 - `--help`        Show help and exit.
-- `--bands`        What bands to process (Optional)
 
 ### Example
 
