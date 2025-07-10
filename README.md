@@ -48,12 +48,6 @@ pip install -r requirements.txt
 python chipper.py --input <INPUT_FILE> [--size <PIXELS>] [--format {tif,png}] [--output-dir <DIR>]
 ```
 
-or
-
-```bash
-make
-```
-
 ### Arguments
 
 - `--input`       Path to the input raster (GeoTIFF, JPEG, etc.).

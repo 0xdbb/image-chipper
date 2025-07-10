@@ -4,3 +4,6 @@ build/
 bin/
 out/
 output/
+.gitignore
+tiff_to_png.py
+Makefile
